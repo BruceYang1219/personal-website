@@ -3,6 +3,10 @@ from flask import render_template
 from flask import request
 import smtplib
 from email.message import EmailMessage
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -45,14 +49,14 @@ def submit():
     msg = EmailMessage()
     msg.set_content(f"Name: {name}\nEmail: {email}\nMessage: {message}")
     msg['Subject'] = "New Message from Contact Form"
-    msg['From'] = "2947998803@qq.com"
-    msg['To'] = "2947998803@qq.com"
+    msg['From'] = os.getenv("EMAIL_ADDRESS")
+    msg['To'] = os.getenv("EMAIL_ADDRESS")
 
-    with smtplib.SMTP_SSL("smtp.qq.com", 465) as server:
-        server.login("2947998803@qq.com", "lrrbyxzjmtfddcif")
+    with smtplib.SMTP_SSL(os.getenv("SMTP_SERVER"), int(os.getenv("SMTP_PORT"))) as server:
+        server.login(os.getenv("EMAIL_ADDRESS"), os.getenv("EMAIL_PASSWORD"))
         server.send_message(msg)
 
-    return "Message Received!"
+    return render_template("message_sent.html")
 
 
 if __name__ == "__main__":
